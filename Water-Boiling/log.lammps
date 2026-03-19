@@ -1,0 +1,299 @@
+LAMMPS (7 Feb 2024 - Update 1)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+#Boiling Water
+
+#Initialization
+units real
+dimension 3 # 3D
+atom_style full
+boundary p p p
+
+#System definition
+region box block -20 20 -20 20 -20 40
+create_box 2 box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 1 extra/special/per/atom 2
+Created orthogonal box = (-20 -20 -20) to (20 20 40)
+  1 by 1 by 1 MPI processor grid
+
+#Settings
+molecule H2O tip3p.mol
+Read molecule template H2O:
+# Water molecule. TIP3P geometry
+  1 molecules
+  0 fragments
+  3 atoms with max type 2
+  2 bonds with max type 1
+  1 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+region liquid block -15 15 -15 15 -20 0
+
+mass 1 15.9994
+mass 2 1.008
+
+pair_style lj/cut/coul/long 8 #LJ + long-range Coulomb
+pair_coeff 1 1 0.1550 3.1536 # O-O
+pair_coeff 2 2 0.0 1.0 # H-H
+pair_coeff 1 2 0.0 0.0 # O-H
+kspace_style pppm 1.0e-4
+special_bonds lj/coul 0.0 0.0 0.0
+
+bond_style harmonic
+bond_coeff 1 450.0 0.9572
+angle_style harmonic
+angle_coeff 1 55.0 104.52
+
+create_atoms 0 random 80 12345 liquid mol H2O 12346 overlap 1.5 maxtry 200
+Created 240 atoms
+  using lattice units in orthogonal box = (-20 -20 -20) to (20 20 40)
+  create_atoms CPU = 0.003 seconds
+
+reset_timestep 0
+velocity all create 300.0 12345 mom yes rot yes
+fix 1 all shake 0.0001 20 1000 b 1 a 1
+Finding SHAKE clusters ...
+       0 = # of size 2 clusters
+       0 = # of size 3 clusters
+       0 = # of size 4 clusters
+      80 = # of frozen angles
+  find clusters CPU = 0.000 seconds
+
+fix 2 all nvt temp 300.0 600.0 100.0
+thermo 200
+thermo_style custom step temp etotal vol density
+
+dump traj all atom 100 dump_boiling_water.lammpstrj
+
+timestep 1.0
+run 20000
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (src/kspace.cpp:342)
+  G vector (1/distance) = 0.28463386
+  grid = 18 18 24
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.032332037
+  estimated relative force accuracy = 9.7366971e-05
+  using double precision FFTW3
+  3d grid and FFT values/proc = 15341 7776
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 10
+  ghost atom cutoff = 10
+  binsize = 5, bins = 8 8 12
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+SHAKE stats (type/ave/delta/count) on step 0
+Bond:   1   0.957198  5.55112e-15      160
+Angle:  1   104.52    6.11067e-13       80
+Per MPI rank memory allocation (min/avg/max) = 9.184 | 9.184 | 9.184 Mbytes
+   Step          Temp          TotEng         Volume        Density    
+         0   450.9434       372.94283      96000          0.024929394  
+       200   380.93578      49.878482      96000          0.024929394  
+       400   318.9488      -50.237047      96000          0.024929394  
+       600   292.35815     -118.16616      96000          0.024929394  
+       800   296.84141     -110.18866      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 1000
+Bond:   1   0.9572    1.85334e-06      160
+Angle:  1   104.52    0.000133237       80
+      1000   334.57663     -88.28631       96000          0.024929394  
+      1200   326.86017     -110.74467      96000          0.024929394  
+      1400   342.32138     -114.15853      96000          0.024929394  
+      1600   316.82553     -153.06086      96000          0.024929394  
+      1800   353.09967     -124.27659      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 2000
+Bond:   1   0.9572    2.32593e-06      160
+Angle:  1   104.52    0.000192796       80
+      2000   335.24476     -127.90522      96000          0.024929394  
+      2200   336.93471     -156.57858      96000          0.024929394  
+      2400   300.43731     -185.29064      96000          0.024929394  
+      2600   372.88554     -188.93507      96000          0.024929394  
+      2800   351.67614     -176.78429      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 3000
+Bond:   1   0.9572    1.90713e-06      160
+Angle:  1   104.52    0.000139962       80
+      3000   342.84486     -190.38996      96000          0.024929394  
+      3200   332.64187     -216.0657       96000          0.024929394  
+      3400   365.09718     -186.95136      96000          0.024929394  
+      3600   301.28744     -208.47611      96000          0.024929394  
+      3800   366.33636     -224.63883      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 4000
+Bond:   1   0.9572    1.72163e-06      160
+Angle:  1   104.52    0.000177019       80
+      4000   350.83516     -237.964        96000          0.024929394  
+      4200   383.88767     -211.50342      96000          0.024929394  
+      4400   320.92854     -243.5552       96000          0.024929394  
+      4600   378.96166     -224.12198      96000          0.024929394  
+      4800   377.60004     -214.50878      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 5000
+Bond:   1   0.9572    1.00595e-06      160
+Angle:  1   104.52    8.7139e-05        80
+      5000   377.54223     -204.40964      96000          0.024929394  
+      5200   397.45733     -216.13337      96000          0.024929394  
+      5400   403.71921     -230.59142      96000          0.024929394  
+      5600   367.42551     -207.95298      96000          0.024929394  
+      5800   416.10697     -172.26381      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 6000
+Bond:   1   0.9572    7.73164e-07      160
+Angle:  1   104.52    7.27941e-05       80
+      6000   392.14503     -194.9478       96000          0.024929394  
+      6200   333.17851     -228.78756      96000          0.024929394  
+      6400   428.75975     -195.60461      96000          0.024929394  
+      6600   338.72686     -222.96546      96000          0.024929394  
+      6800   400.56576     -194.06866      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 7000
+Bond:   1   0.9572    1.09855e-06      160
+Angle:  1   104.52    8.28047e-05       80
+      7000   363.7012      -206.89621      96000          0.024929394  
+      7200   395.86857     -218.09158      96000          0.024929394  
+      7400   416.12016     -183.45021      96000          0.024929394  
+      7600   374.19259     -207.16763      96000          0.024929394  
+      7800   381.79208     -200.36629      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 8000
+Bond:   1   0.9572    1.1401e-06       160
+Angle:  1   104.52    0.000124663       80
+      8000   434.4526      -172.98493      96000          0.024929394  
+      8200   387.89822     -199.63778      96000          0.024929394  
+      8400   448.6872      -154.50457      96000          0.024929394  
+      8600   394.56472     -176.23399      96000          0.024929394  
+      8800   422.28701     -175.99824      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 9000
+Bond:   1   0.9572    9.80924e-07      160
+Angle:  1   104.52    0.000132308       80
+      9000   420.20787     -132.00408      96000          0.024929394  
+      9200   417.7099      -148.27888      96000          0.024929394  
+      9400   404.97794     -161.70044      96000          0.024929394  
+      9600   475.39317     -138.48126      96000          0.024929394  
+      9800   397.42245     -163.63658      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 10000
+Bond:   1   0.9572    9.31721e-07      160
+Angle:  1   104.52    8.28618e-05       80
+     10000   458.36754     -116.63703      96000          0.024929394  
+     10200   442.17122     -124.82462      96000          0.024929394  
+     10400   474.80329     -112.97496      96000          0.024929394  
+     10600   493.16457     -88.659724      96000          0.024929394  
+     10800   411.48974     -128.55101      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 11000
+Bond:   1   0.9572    1.3581e-06       160
+Angle:  1   104.52    0.000171577       80
+     11000   487.20445     -91.91053       96000          0.024929394  
+     11200   435.10992     -109.73271      96000          0.024929394  
+     11400   490.90701     -95.015971      96000          0.024929394  
+     11600   523.7212      -69.934091      96000          0.024929394  
+     11800   449.32732     -110.61275      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 12000
+Bond:   1   0.9572    1.15465e-06      160
+Angle:  1   104.52    8.06077e-05       80
+     12000   537.94782     -60.959196      96000          0.024929394  
+     12200   477.14253     -102.19188      96000          0.024929394  
+     12400   537.21583     -76.85093       96000          0.024929394  
+     12600   428.70637     -131.3481       96000          0.024929394  
+     12800   491.15203     -95.119097      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 13000
+Bond:   1   0.9572    1.43972e-06      160
+Angle:  1   104.52    0.000103925       80
+     13000   497.8841      -74.856289      96000          0.024929394  
+     13200   503.02855     -54.384485      96000          0.024929394  
+     13400   480.62357     -50.558943      96000          0.024929394  
+     13600   516.44318     -15.126745      96000          0.024929394  
+     13800   511.85701     -2.1341313      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 14000
+Bond:   1   0.957199  4.57349e-06      160
+Angle:  1   104.52    0.000258843       80
+     14000   498.98241     -21.169501      96000          0.024929394  
+     14200   491.28989     -32.263165      96000          0.024929394  
+     14400   529.90388      14.471638      96000          0.024929394  
+     14600   494.54528      2.7664279      96000          0.024929394  
+     14800   599.95289      57.498975      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 15000
+Bond:   1   0.9572    7.25755e-07      160
+Angle:  1   104.52    4.00842e-05       80
+     15000   483.48377      4.4663497      96000          0.024929394  
+     15200   562.70832      31.021023      96000          0.024929394  
+     15400   446.66918     -19.41743       96000          0.024929394  
+     15600   560.31927      11.685793      96000          0.024929394  
+     15800   533.11775      1.9285995      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 16000
+Bond:   1   0.9572    2.65326e-06      160
+Angle:  1   104.52    0.000232043       80
+     16000   514.48391     -14.190654      96000          0.024929394  
+     16200   525.4169       37.599669      96000          0.024929394  
+     16400   545.52878      49.822077      96000          0.024929394  
+     16600   524.92166      29.189657      96000          0.024929394  
+     16800   567.43484      68.594283      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 17000
+Bond:   1   0.9572    1.87799e-06      160
+Angle:  1   104.52    0.000203371       80
+     17000   527.13848      44.691466      96000          0.024929394  
+     17200   552.99832      55.056443      96000          0.024929394  
+     17400   565.71534      56.28573       96000          0.024929394  
+     17600   469.62365      17.592965      96000          0.024929394  
+     17800   591.83435      73.635248      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 18000
+Bond:   1   0.957201  4.8653e-06       160
+Angle:  1   104.52    0.000352376       80
+     18000   590.52687      95.8868        96000          0.024929394  
+     18200   597.1251       107.47003      96000          0.024929394  
+     18400   493.69846      60.881604      96000          0.024929394  
+     18600   591.40232      101.59874      96000          0.024929394  
+     18800   581.30483      105.19032      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 19000
+Bond:   1   0.9572    7.21703e-07      160
+Angle:  1   104.52    5.18447e-05       80
+     19000   598.42167      98.152728      96000          0.024929394  
+     19200   586.40006      89.231377      96000          0.024929394  
+     19400   522.17931      61.377615      96000          0.024929394  
+     19600   605.64171      120.70723      96000          0.024929394  
+     19800   605.41745      98.707262      96000          0.024929394  
+SHAKE stats (type/ave/delta/count) on step 20000
+Bond:   1   0.957201  3.76369e-06      160
+Angle:  1   104.52    0.000366411       80
+     20000   544.10424      78.456404      96000          0.024929394  
+Loop time of 22.1763 on 1 procs for 20000 steps with 240 atoms
+
+Performance: 77.921 ns/day, 0.308 hours/ns, 901.864 timesteps/s, 216.447 katom-step/s
+99.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2.079      | 2.079      | 2.079      |   0.0 |  9.37
+Bond    | 0.012931   | 0.012931   | 0.012931   |   0.0 |  0.06
+Kspace  | 19.151     | 19.151     | 19.151     |   0.0 | 86.36
+Neigh   | 0.24462    | 0.24462    | 0.24462    |   0.0 |  1.10
+Comm    | 0.091006   | 0.091006   | 0.091006   |   0.0 |  0.41
+Output  | 0.069734   | 0.069734   | 0.069734   |   0.0 |  0.31
+Modify  | 0.47528    | 0.47528    | 0.47528    |   0.0 |  2.14
+Other   |            | 0.05274    |            |       |  0.24
+
+Nlocal:            240 ave         240 max         240 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            557 ave         557 max         557 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           2473 ave        2473 max        2473 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2473
+Ave neighs/atom = 10.304167
+Ave special neighs/atom = 2
+Neighbor list builds = 996
+Dangerous builds = 0
+
+write_data water_boiling.data nocoeff
+System init for write_data ...
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (src/kspace.cpp:342)
+  G vector (1/distance) = 0.28463386
+  grid = 18 18 24
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.032332037
+  estimated relative force accuracy = 9.7366971e-05
+  using double precision FFTW3
+  3d grid and FFT values/proc = 15341 7776
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Total wall time: 0:00:22
